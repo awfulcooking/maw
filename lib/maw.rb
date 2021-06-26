@@ -93,14 +93,17 @@ module Maw
   Ergonomics = Ergonomic # to be even more ergonomic
 
   class Controls
-    @@i = 0
-
+    attr_accessor :name
+    
+    @@i = 0    
     def initialize name="Control Set #{@@i+=1}", &blk
       @name = name
 
       instance_exec(&blk) if blk
       self
     end
+
+    def to_s; "[#{name}]"; end
 
     def is? state, device, key
       if device == :mouse # mouse doesn't support state qualifiers like .key_down, .key_held etc
