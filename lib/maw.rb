@@ -17,6 +17,10 @@ def Maw!
   include Maw::Ergonomic
 end
 
+def ergonomic!
+  include Maw::Ergonomic
+end
+
 module Maw
   def maw?; true; end
 
