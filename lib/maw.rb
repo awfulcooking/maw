@@ -7,20 +7,50 @@
 
 $args = $gtk.args
 $outputs = $args.outputs
+$state = $args.state
 
 def Maw!
-  $top_level.include Maw
-  $top_level.include Maw::Ergonomic
+  extend Maw::Tick
+
+  include Maw
+  include Maw::Init
+  include Maw::Ergonomic
 end
 
 module Maw
   def maw?; true; end
+
+  module Init
+    def init &blk
+      if blk
+        @init = blk
+      else
+        @init&.call
+      end
+    end
+  end
+
+  module Tick
+    def tick args=nil, &blk
+      if blk
+        @tick = blk
+      else
+        if ::Maw::Init === self and !$state.did_maw_init
+          $state.did_maw_init = true
+          init
+        end
+        @tick&.call
+      end
+    end
+  end
 
   module Ergonomic
     class << self
       def included(base)
         @setup ||= setup!
       end
+
+      alias :extended :included
       
       def activate(base=$top_level)
         base.include self
@@ -33,6 +63,7 @@ module Maw
 
           eval "
             module ::Maw::Ergonomic
+              private
               def #{name}
                 $args.#{name}
               end
@@ -49,16 +80,29 @@ module Maw
     def tick_count
       Kernel.tick_count
     end
+
+    def controls
+      $default_controls ||= ::Maw::Controls.new
+    end
   end
 
   Ergonomics = Ergonomic # to be even more ergonomic
 
   class Controls
+    @@i = 0
+
+    def initialize name="Control Set #{@@i+=1}", &blk
+      @name = name
+
+      instance_exec(&blk) if blk
+      self
+    end
+
     def is? state, device, key
       if device == :mouse # mouse doesn't support state qualifiers like .key_down, .key_held etc
-        $inputs.mouse.send(key)
+        $args.inputs.mouse.send(key)
       else
-        $inputs.send(device).send(state).send(key)
+        $args.inputs.send(device).send(state).send(key)
       end
     end
 
