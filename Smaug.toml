@@ -1,0 +1,15 @@
+[package]
+name = "maw"
+version = "1"
+homepage = "https://github.com/togetherbeer/maw"
+documentation = "https://github.com/togetherbeer/maw"
+authors = ["mooff <mooff@together.beer>"]
+keywords = ["inputs", "keyboard", "controller", "mouse", "controls", "dsl", "helper", "class"]
+
+requires = [
+	"lib/maw.rb"
+]
+
+[dragonruby]
+version = "2.17"
+edition = "standard"
