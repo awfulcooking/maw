@@ -85,8 +85,10 @@ module Maw
       Kernel.tick_count
     end
 
-    def controls
+    def controls &blk
       $default_controls ||= ::Maw::Controls.new
+      $default_controls.instance_eval(&blk) if blk
+      $default_controls
     end
   end
 
