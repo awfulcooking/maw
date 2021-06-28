@@ -5,9 +5,7 @@
 # @version 1.2.0
 # @license AGPLv3
 
-$args = $gtk.args
 $outputs = $args.outputs
-$state = $args.state
 
 def Maw!
   extend Maw::Tick
