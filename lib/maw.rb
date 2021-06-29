@@ -42,8 +42,31 @@ module Maw
           $state.did_maw_init = true
           init
         end
-        @tick&.call
+        if @time_ticks
+          start = Time.now
+          result = @tick&.call
+
+          @tick_times[(@tick_times_i += 1) % @tick_time_history_count] = Time.now - start
+
+          if @tick_time_log and $args.tick_count % (60*5) == 0
+            total = 0
+            for time in @tick_times
+              total += time
+            end
+            average = total / @tick_times.size
+            log_info "[Maw] Average tick time: #{'%.2f' % (average*1000)} ms"
+          end
+        else
+          @tick&.call
+        end
       end
+    end
+
+    def time_ticks! opts={}
+      @time_ticks = (opts[:enable] != false)
+      @tick_times = []
+      @tick_time_history_count = opts[:history] || 64
+      @tick_time_log = opts[:log] != false
     end
   end
 
