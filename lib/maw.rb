@@ -89,8 +89,7 @@ module Maw
 
           eval "
             module ::Maw::Ergonomic
-              private
-              def #{name}
+              private def #{name}
                 $args.#{name}
               end
             end"
