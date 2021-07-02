@@ -126,11 +126,15 @@ module Maw
   end
 
   class Controls
+    @@i = 0
+    def self.next_name
+      "Control Set #{@@i+=1}"
+    end
+
     attr_accessor :name
     
-    @@i = 0    
-    def initialize name="Control Set #{@@i+=1}", &blk
-      @name = name
+    def initialize name=nil, &blk
+      @name = name || Controls.next_name
 
       instance_exec(&blk) if blk
       self
