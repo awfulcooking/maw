@@ -2,7 +2,7 @@
 # https://github.com/togetherbeer/maw
 #
 # @copyright 2021 mooff <mooff@@together.beer>
-# @version 1.3.4
+# @version 1.3.5
 # @license AGPLv3
 
 $outputs = $args.outputs
