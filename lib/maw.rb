@@ -132,6 +132,12 @@ module Maw
 
     alias :production? :prod?
     alias :development? :dev?
+
+    DESKTOP_PLATFORMS = ['Windows', 'Linux', 'Mac'].freeze
+
+    def desktop?
+      DESKTOP_PLATFORMS.include? $gtk.platform
+    end
   end
 
   class Controls
