@@ -124,6 +124,14 @@ module Maw
     def sounds
       $outputs.sounds
     end
+
+    PRODUCTION = $gtk.production
+
+    def prod?; PRODUCTION; end
+    def dev?; !PRODUCTION; end
+
+    alias :production? :prod?
+    alias :development? :dev?
   end
 
   class Controls
