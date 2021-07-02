@@ -48,7 +48,7 @@ module Maw
 
           @tick_times[(@tick_times_i += 1) % @tick_time_history_count] = Time.now - start
 
-          if @tick_time_log and $args.tick_count % (60*5) == 0
+          if @tick_time_log and $args.tick_count % (@tick_time_log_interval) == 0
             total = 0
             for time in @tick_times
               total += time
@@ -67,6 +67,7 @@ module Maw
       @tick_times = []
       @tick_time_history_count = opts[:history] || 64
       @tick_time_log = opts[:log] != false
+      @tick_time_log_interval = opts[:log_interval] || 60*5 # log every this number of frames
     end
   end
 
