@@ -99,15 +99,15 @@ module Maw
       end
     end
 
-    def args
+    private def args
       $args
     end
 
-    def tick_count
+    private def tick_count
       Kernel.tick_count
     end
 
-    def controls &blk
+    private def controls &blk
       $default_controls ||= ::Maw::Controls.new
       $default_controls.instance_eval(&blk) if blk
       $default_controls
@@ -137,6 +137,10 @@ module Maw
 
     def desktop?
       DESKTOP_PLATFORMS.include? $gtk.platform
+    end
+
+    instance_methods(false).each do |method|
+      private method
     end
   end
 
