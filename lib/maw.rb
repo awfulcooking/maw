@@ -162,9 +162,19 @@ module Maw
     def to_s; "[#{name}]"; end
 
     def is? state, device, key
-      if device == :mouse # mouse doesn't support state qualifiers like .key_down, .key_held etc
+      case device
+      when :mouse
+        # mouse doesn't support state qualifiers .key_down, .key_held etc
         $args.inputs.mouse.send(key)
+      when :controller_three
+        # controller_three is not aliased under inputs, but
+        # we can make it work
+        $args.inputs.controllers[2]&.send(state)&.send(key)
+      when :controller_four
+        # same deal here
+        $args.inputs.controllers[3]&.send(state)&.send(key)
       else
+        # this is the normal path
         $args.inputs.send(device).send(state).send(key)
       end
     end
