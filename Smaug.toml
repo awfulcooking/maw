@@ -1,6 +1,6 @@
 [package]
 name = "maw"
-version = "1.3.6"
+version = "1.3.9"
 homepage = "https://github.com/togetherbeer/maw"
 documentation = "https://github.com/togetherbeer/maw"
 authors = ["mooff <mooff@together.beer>"]
