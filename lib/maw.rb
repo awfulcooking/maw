@@ -134,9 +134,10 @@ module Maw
     alias :development? :dev?
 
     DESKTOP_PLATFORMS = ['Windows', 'Linux', 'Mac'].freeze
+    IS_DESKTOP_PLATFORM = DESKTOP_PLATFORMS.include? $gtk.platform
 
     def desktop?
-      DESKTOP_PLATFORMS.include? $gtk.platform
+      IS_DESKTOP_PLATFORM
     end
 
     instance_methods(false).each do |method|
