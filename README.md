@@ -29,7 +29,7 @@ So you'll never have to type `args` again!
 Maw offers **Controls** which lets you map keyboard, mouse and controller binds to action names, then check their state in a convenient way:
 
 ```ruby
-controls;define :quit, keyboard: :q
+controls.define :quit, keyboard: :q
 controls.define :debug, keyboard: :back_slash if development?
 controls.define :attack, keyboard: :e, mouse: :button_left, controller_one: :x
 ```
