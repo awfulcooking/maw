@@ -198,6 +198,10 @@ module Maw
 
     alias :action :define
 
+    def stub action
+      define action, {}
+    end
+
     private
 
     def define_down action, map
