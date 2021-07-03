@@ -154,6 +154,7 @@ module Maw
     
     def initialize name=nil, &blk
       @name = name || Controls.next_name
+      @latch = {}
 
       instance_exec(&blk) if blk
       self
@@ -189,6 +190,7 @@ module Maw
       map = normalize map
 
       define_down action, map
+      define_latch action, map
       define_held action, map
       define_up action, map
       define_active action, map
@@ -213,6 +215,18 @@ module Maw
     def define_up action, map
       [:"#{action}_up", :"#{action}_up?"].each do |name|
         define_singleton_method(name) { any? :key_up, map }
+      end
+    end
+
+    def define_latch action, map
+      [:"#{action}_latch", :"#{action}_latch?"].each do |name|
+        define_singleton_method(name) {
+          if any?(:key_down, map)
+            @latch[action] = !@latch[action]
+          else
+            @latch[action]
+          end
+        }
       end
     end
 
