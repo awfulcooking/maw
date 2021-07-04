@@ -2,8 +2,10 @@
 # https://github.com/togetherbeer/maw
 #
 # @copyright 2021 mooff <mooff@@together.beer>
-# @version 1.3.9
+# @version 1.4.0
 # @license AGPLv3
+
+$maw_version = "1.4.0"
 
 $outputs = $args.outputs
 
@@ -16,13 +18,14 @@ def Maw!
   include Maw::Helpers
 end
 
+def maw?; true; end
+def maw_version; $maw_version; end
+
 def ergonomic!
   include Maw::Ergonomic
 end
 
 module Maw
-  def maw?; true; end
-
   module Init
     def init &blk
       if blk
