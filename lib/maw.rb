@@ -18,10 +18,10 @@ def Maw!
   include Maw::Helpers
 end
 
-def maw?; true; end
-def maw_version; $maw_version; end
+private def maw?; true; end
+private def maw_version; $maw_version; end
 
-def ergonomic!
+private def ergonomic!
   include Maw::Ergonomic
 end
 
