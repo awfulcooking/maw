@@ -5,20 +5,12 @@
 # @version 1.4.0
 # @license AGPLv3
 
-_maw_version = "1.4.0"
-
 if $maw_version and $maw_source_location != __FILE__
-  puts "Maw has already been loaded in this project from another location:
-    Source: #{$maw_source_location}
-    Version: #{$maw_version}
-    This version will now abort, leaving the existing library unchanged.
-    Source: #{__FILE__}
-    Version: #{_maw_version}
-  "
+  puts "Maw has already been loaded from another location: #{$maw_source_location} (version #{$maw_version}).\nThis version (#{__FILE__}) will now abort, leaving the existing library unchanged."
   return
 end
 
-$maw_version = _maw_version
+$maw_version = "1.4.0"
 $maw_source_location = __FILE__
 
 $outputs = $args.outputs
