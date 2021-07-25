@@ -52,10 +52,10 @@ module Maw
           init
         end
         if @time_ticks
-          start = Time.now
+          start = Time.now.to_f
           result = @tick&.call
 
-          @tick_times[(@tick_times_i += 1) % @tick_time_history_count] = Time.now - start
+          @tick_times[(@tick_times_i += 1) % @tick_time_history_count] = Time.now.to_f - start
 
           if @tick_time_log and $args.tick_count % (@tick_time_log_interval) == 0
             total = 0
