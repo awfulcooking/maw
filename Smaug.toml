@@ -3,7 +3,7 @@ name = "maw"
 version = "1.4.0"
 homepage = "https://github.com/togetherbeer/maw"
 documentation = "https://github.com/togetherbeer/maw"
-authors = ["mooff <mooff@together.beer>"]
+authors = ["mooff <mooff@tipjar.cool>"]
 keywords = ["inputs", "keyboard", "controller", "mouse", "controls", "dsl", "helper", "class"]
 
 requires = [
