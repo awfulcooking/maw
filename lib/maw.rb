@@ -78,6 +78,8 @@ module Maw
       @tick_time_log = opts[:log] != false
       @tick_time_log_interval = opts[:log_interval] || 60*5 # log every this number of frames
     end
+
+    attr_reader :tick_times
   end
 
   module Ergonomic
