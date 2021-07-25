@@ -2,7 +2,7 @@
 # https://github.com/togetherbeer/maw
 #
 # @copyright 2021 mooff <mooff@@together.beer>
-# @version 1.4.0
+# @version 1.4.1
 # @license AGPLv3
 
 if $maw_version and $maw_source_location != __FILE__
@@ -10,7 +10,7 @@ if $maw_version and $maw_source_location != __FILE__
   return
 end
 
-$maw_version = "1.4.0"
+$maw_version = "1.4.1"
 $maw_source_location = __FILE__
 
 $outputs = $args.outputs
