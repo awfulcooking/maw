@@ -59,8 +59,11 @@ module Maw
 
           if @tick_time_log and $args.tick_count % (@tick_time_log_interval) == 0
             total = 0
-            for time in @tick_times
-              total += time
+            i = 0
+            len = @tick_times.size
+            while i < len
+              total += @tick_times.at(i)
+              i += 1
             end
             average = total / @tick_times.size
             log_info "[Maw] Average tick time: #{'%.2f' % (average*1000)} ms"
