@@ -1,142 +1,58 @@
-# Maw DSL for DragonRuby
-# https://github.com/togetherbeer/maw
+# Maw - a DSL for DragonRuby
+# https://github.com/awfulcooking/maw
 #
-# @copyright 2021 mooff <mooff@@together.beer>
-# @version 1.4.1
-# @license AGPLv3
+# @copyright 2022 mooff <mooff@@awful.cooking>
+# @version 2.0.0
+# @license MIT
 
 if $maw_version and $maw_source_location != __FILE__
   puts "Maw has already been loaded from another location: #{$maw_source_location} (version #{$maw_version}).\nThis version (#{__FILE__}) will now abort, leaving the existing library unchanged."
   return
 end
 
-$maw_version = "1.4.1"
+$maw_version = "2.0.0"
 $maw_source_location = __FILE__
 
-$outputs = $args.outputs
+class << $top_level
+  def Maw!(output_globals: true)
+    extend Maw::Tick
+    extend Maw::Init
 
-def Maw!
-  extend Maw::Tick
+    include Maw
+    include Maw::Helpers
 
-  include Maw
-  include Maw::Init
-  include Maw::Ergonomic
-  include Maw::Helpers
-end
-
-private def maw?; true; end
-private def maw_version; $maw_version; end
-
-private def ergonomic!
-  include Maw::Ergonomic
+    Maw.set_output_globals! if output_globals
+  end
 end
 
 module Maw
-  module Init
-    def init &blk
-      if blk
-        @init = blk
-      else
-        @init&.call
-      end
-    end
+  OUTPUTS = %i[
+    borders debug labels lines primitives solids sprites
+    static_borders static_debug static_labels static_lines
+    static_primitives static_solids static_sprites
+  ]
+  
+  def Maw.set_output_globals!
+    eval OUTPUTS.map { |name| "$#{name} = $outputs.#{name};" }.join
   end
-
-  module Tick
-    def tick args=nil, &blk
-      if blk
-        @tick = blk
-      else
-        if ::Maw::Init === self and !$state.did_maw_init
-          $state.did_maw_init = true
-          init
-        end
-        if @time_ticks
-          start = Time.now.to_f
-          result = @tick&.call
-
-          @tick_times[(@tick_times_i += 1) % @tick_time_history_count] = Time.now.to_f - start
-
-          if @tick_time_log and $args.tick_count % (@tick_time_log_interval) == 0
-            total = 0
-            i = 0
-            len = @tick_times.size
-            while i < len
-              total += @tick_times.at(i)
-              i += 1
-            end
-            average = total / @tick_times.size
-            log_info "[Maw] Average tick time: #{'%.2f' % (average*1000)} ms"
-          end
-        else
-          @tick&.call
-        end
-      end
-    end
-
-    def time_ticks! opts={}
-      @time_ticks = (opts[:enable] != false)
-      @tick_times = []
-      @tick_time_history_count = opts[:history] || 64
-      @tick_time_log = opts[:log] != false
-      @tick_time_log_interval = opts[:log_interval] || 60*5 # log every this number of frames
-    end
-
-    attr_reader :tick_times
-  end
-
-  module Ergonomic
-    class << self
-      def included(base)
-        @setup ||= setup!
-      end
-
-      alias :extended :included
-      
-      def activate(base=$top_level)
-        base.include self
-      end
-
-      def setup!
-        $args.methods(false).each do |name|
-          next if name.to_s.end_with? '='
-          next if Kernel.respond_to? name
-
-          eval "
-            module ::Maw::Ergonomic
-              private def #{name}
-                $args.#{name}
-              end
-            end"
-        end
-        true
-      end
-    end
-
-    private def args
-      $args
-    end
-
-    private def tick_count
-      Kernel.tick_count
-    end
-
-    private def controls &blk
-      $default_controls ||= ::Maw::Controls.new
-      $default_controls.instance_eval(&blk) if blk
-      $default_controls
-    end
-  end
-
-  Ergonomics = Ergonomic # to be even more ergonomic
+  
+  def maw_version() = $maw_version
 
   module Helpers
+    private
+
     def background! color=[0,0,0]
       $outputs.background_color = color
     end
 
-    def sounds
-      $outputs.sounds
+    def tick_count
+      Kernel.tick_count
+    end
+
+    def controls &blk
+      $default_controls ||= ::Maw::Controls.new
+      $default_controls.instance_eval(&blk) if blk
+      $default_controls
     end
 
     PRODUCTION = $gtk.production
@@ -153,16 +69,12 @@ module Maw
     def desktop?
       IS_DESKTOP_PLATFORM
     end
-
-    instance_methods(false).each do |method|
-      private method
-    end
   end
 
   class Controls
-    @@i = 0
     def self.next_name
-      "Control Set #{@@i+=1}"
+      @@i ||= 0; @@i += 1
+      "Control Set #{@@i}"
     end
 
     attr_accessor :name
@@ -181,18 +93,9 @@ module Maw
 
     def input_state state, device, key
       case device
-      when :mouse
-        # mouse doesn't support state qualifiers .key_down, .key_held etc
+      when :mouse # mouse doesn't support state qualifiers .key_down, .key_held etc
         $args.inputs.mouse.send(key)
-      when :controller_three
-        # controller_three is not aliased under inputs, but
-        # we can make it work
-        $args.inputs.controllers[2]&.send(state)&.send(key)
-      when :controller_four
-        # same deal here
-        $args.inputs.controllers[3]&.send(state)&.send(key)
-      else
-        # this is the normal path
+      else # this is the normal path
         $args.inputs.send(device).send(state).send(key)
       end
     end
@@ -295,4 +198,67 @@ module Maw
       map.map { |(device, keys)| [device, Array(keys)] }.to_h
     end
   end
+
+  module Init
+    def init &blk
+      if blk
+        @init = blk
+      else
+        @init&.call
+      end
+    end
+  end
+
+  module Tick
+    def tick args=nil, &blk
+      if blk
+        @tick = blk
+      else
+        if ::Maw::Init === self and !$state.did_maw_init
+          $state.did_maw_init = true
+          init
+        end
+        if @time_ticks
+          start = Time.now.to_f
+          result = @tick&.call
+
+          @tick_times[(@tick_times_i += 1) % @tick_time_history_count] = Time.now.to_f - start
+
+          if @tick_time_log and $args.tick_count % (@tick_time_log_interval) == 0
+            total = 0
+            min = max = nil
+            i = 0
+            len = @tick_times.size
+            while i < len
+              t = @tick_times[i]
+              min = t if !min or t < min
+              max = t if !max or t > max
+              total += t
+              i += 1
+            end
+            average = total / @tick_times.size
+            if $args.tick_count == 0
+              puts "-- (Maw) First tick took %.2f ms" % (average*1000)
+            else
+              puts "-- (Maw) Tick = min #{'%.2f' % (min*1000)}  max #{'%.2f' % (max*1000)}  avg #{'%.2f' % (average*1000)}"
+            end
+          end
+        else
+          @tick&.call
+        end
+      end
+    end
+
+    def time_ticks! opts={}
+      @time_ticks = (opts[:enable] != false)
+      @tick_times = []
+      @tick_time_history_count = opts[:history] || 64
+      @tick_time_log = opts[:log] != false
+      @tick_time_log_interval = opts[:log_interval] || 60*5 # log every this number of frames
+      @tick_times_i = -1
+    end
+
+    attr_reader :tick_times
+  end
 end
+
